@@ -1,0 +1,26 @@
+🔹 🟢 Level 1 — Basic (foundation)
+1) Total number of orders
+2) Total number of customers
+3) Total revenue generated
+4) Average order value
+
+
+🔹 🟡 Level 2 — Core Business Analysis
+5) Monthly sales trend
+6) Top 10 products by revenue
+7) Top 5 customers by spending
+8) Orders by payment method
+9) Category-wise sales performance
+10) Average items per order
+
+
+🔹 🔴 Level 3 — Advanced
+11) Repeat vs new customers
+12) Customer lifetime value (CLV – basic)
+13) Top-selling product in each category
+14) Rank customers based on spending (RANK())
+15) Running total of revenue (WINDOW FUNCTION)
+16) Peak order month/day
+17) Top revenue-generating category
+18) Customer retention rate
+19) Revenue by payment type vs order count
