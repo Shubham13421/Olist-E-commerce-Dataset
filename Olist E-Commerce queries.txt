@@ -1,0 +1,150 @@
+-- Total number of orders
+SELECT 
+    COUNT(order_id) AS Total_number_of_orders
+FROM
+    olist_orders_dataset;
+
+
+-- Total number of customers
+SELECT 
+    COUNT(DISTINCT customer_unique_id) AS Total_number_of_customers
+FROM
+    olist_customers_dataset;
+
+
+-- Total revenue generated
+SELECT 
+    ROUND(SUM(price + freight_value), 2) AS Total_revenue_generated
+FROM
+    olist_order_items_dataset;
+
+
+-- Average order value
+SELECT 
+    ROUND(SUM(price + freight_value) / COUNT(DISTINCT order_id),
+            2) AS Average_order_value
+FROM
+    olist_order_items_dataset;
+
+
+-- Monthly sales trend
+SELECT 
+    DATE_FORMAT(order_purchase_timestamp, '%Y-%M') AS Month,
+    ROUND(SUM(price + freight_value), 2) AS Total_sales
+FROM
+    olist_order_items_dataset otd
+        JOIN
+    olist_orders_dataset od ON otd.order_id = od.order_id
+GROUP BY DATE_FORMAT(order_purchase_timestamp, '%Y-%M')
+ORDER BY Total_sales desc;
+
+
+-- Top 10 products by revenue
+SELECT 
+    pd.product_id,
+    ROUND(SUM(otd.price + otd.freight_value), 2) AS Total_sales
+FROM
+    olist_order_items_dataset otd
+        JOIN
+    olist_products_dataset pd ON otd.product_id = pd.product_id
+GROUP BY pd.product_id
+ORDER BY Total_sales DESC
+LIMIT 10;
+
+
+-- Top 5 customers by spending
+SELECT 
+    cd.customer_unique_id,
+    ROUND(SUM(otd.price + otd.freight_value), 2) AS Total_sales
+FROM
+    olist_customers_dataset cd
+        JOIN
+    olist_orders_dataset od ON cd.customer_id = od.customer_id
+        JOIN
+    olist_order_items_dataset otd ON od.order_id = otd.order_id
+GROUP BY cd.customer_unique_id
+ORDER BY Total_sales DESC
+LIMIT 5;
+
+
+-- Orders by payment method
+SELECT 
+    opm.payment_type,
+    COUNT(DISTINCT opm.order_id) AS No_of_orders
+FROM
+    olist_order_payments_dataset opm
+GROUP BY opm.payment_type;
+
+
+-- Category-wise sales performance
+SELECT 
+    opd.product_category_name,
+    ROUND(SUM(otd.price + otd.freight_value), 2) AS Total_sales
+FROM
+    olist_products_dataset opd
+        JOIN
+    olist_order_items_dataset otd ON opd.product_id = otd.product_id
+GROUP BY opd.product_category_name
+ORDER BY Total_sales DESC;
+
+
+-- Average items per order
+SELECT 
+    ROUND(AVG(items_per_order), 2) AS Avg_items_per_order
+FROM
+    (SELECT 
+        otd.order_id, COUNT(*) AS items_per_order
+    FROM
+        olist_order_items_dataset otd
+    GROUP BY otd.order_id) t;
+
+
+-- Peak order month/day
+Select * from
+(Select date(order_purchase_timestamp) as Order_date,
+count(od.order_id) as Total_orders,
+Rank () over (order by count(od.order_id) desc) as rnk
+from olist_orders_dataset od
+group by Order_date) t
+where rnk=1;
+
+
+-- Top revenue-generating category
+Select opd.product_category_name, Round(sum(price+freight_value),2) as Total_sales,
+Rank () over (order by Round(sum(price+freight_value),2) desc) as rnk
+from olist_products_dataset opd
+join olist_order_items_dataset otd on otd.product_id=opd.product_id
+group by opd.product_category_name
+order by Total_sales desc;
+
+
+-- Customer retention rate
+SELECT 
+    ROUND(COUNT(DISTINCT CASE
+                    WHEN order_count > 1 THEN customer_unique_id
+                END) * 100.0 / COUNT(DISTINCT customer_unique_id),
+            2) AS Retention_rate
+FROM
+    (SELECT 
+        cd.customer_unique_id, COUNT(od.order_id) AS order_count
+    FROM
+        olist_orders_dataset od
+    JOIN olist_customers_dataset cd ON cd.customer_id = od.customer_id
+    GROUP BY cd.customer_unique_id) t;
+
+
+-- Revenue by payment type vs order count
+SELECT 
+    opd.payment_type,
+    ROUND(SUM(oi.order_revenue), 2) AS total_revenue,
+    COUNT(DISTINCT opd.order_id) AS order_count
+FROM
+    olist_order_payments_dataset opd
+        JOIN
+    (SELECT 
+        order_id, SUM(price + freight_value) AS order_revenue
+    FROM
+        olist_order_items_dataset
+    GROUP BY order_id) oi ON oi.order_id = opd.order_id
+GROUP BY opd.payment_type
+ORDER BY total_revenue DESC;
