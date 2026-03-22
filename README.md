@@ -3,7 +3,7 @@
 
 ## 📌 Project Overview
 
-This project analyzes the Brazilian Olist e-commerce dataset using **SQL and Power BI** to extract meaningful business insights. It focuses on customer behavior, sales performance, and revenue trends to support data-driven decision-making.
+In this project, I analyzed the Brazilian Olist e-commerce dataset using **SQL and Power BI** to extract meaningful business insights. It focuses on customer behavior, sales performance, and revenue trends to support data-driven decision-making.
 
 ---
 
